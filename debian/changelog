@@ -1,0 +1,5 @@
+cross-binutils (0.1) UNRELEASED; urgency=low
+
+  * Initial release
+
+ -- Wookey <wookey@debian.org>  Sat, 01 Feb 2014 01:04:00 +0100

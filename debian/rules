@@ -1,0 +1,160 @@
+#!/usr/bin/make -f
+
+# prefix for builds - without leading slash
+PF ?= usr
+
+THIS_PKG         := $(shell dpkg-parsechangelog| sed -n 's/-*//; s/^Source: \(.*\)/\1/p')
+THIS_PKG_VER     := $(shell dpkg-parsechangelog| sed -n 's/^Version: \(.*\)/\1/p')
+
+TARGET_GNU_TYPE   := $(shell dpkg-architecture -a${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f)
+HOST_ARCH        := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+HOST_GNU_TYPE    := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+BUILD_ARCH       := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+stamp            := stamp-dir/
+
+DISTRO ?= $(shell lsb_release -is)
+
+VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-'|cut -d '.' -f1-3)
+PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-')
+DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' ')
+
+BINUTILS_DIR  := /usr/src/binutils
+
+ifeq ($(DISTRO),Debian)
+
+TARGET_LIST := armhf armel
+#TARGET_LIST := armhf armel mips mipsel i386 amd64
+
+else # Ubuntu
+
+TARGET_LIST := armhf armel arm64
+
+endif
+
+# taken from gcc packaging
+define unpack_tarball
+	tar -x -f $1
+endef
+
+info:
+	@echo "Binutils version:         ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
+	@echo
+	@echo "Target architecture list: ${TARGET_LIST}"     
+	@echo "Host architecture:        ${HOST_ARCH}"
+	@echo "Host GNU type:            ${HOST_GNU_TYPE}"
+
+$(stamp)init-dirs:
+	mkdir debian/tmp -p
+	touch $@
+
+init: $(stamp)init
+
+
+$(stamp)init:
+	@echo START $@
+	$(call unpack_tarball, ${BINUTILS_DIR}/binutils-${VER_BINUTILS}.tar.xz)
+	set -e; \
+	cd binutils-${PKG_VER_BINUTILS} ;\
+	cp -a ${BINUTILS_DIR}/debian/ . ;\
+	if [ -n "$$(grep -v '^\#' ${CURDIR}/debian/patches/binutils/series)" ]; then \
+	  QUILT_PATCHES=${CURDIR}/debian/patches/binutils quilt push -a; \
+	fi; \
+	echo ${DEB_TARGET_ARCH} > debian/target;
+
+	touch $@
+
+$(stamp)build-armel $(stamp)build-armhf: $(stamp)init 
+	@echo START $@
+	cd binutils-${PKG_VER_BINUTILS}; \
+	echo DEB_TARGET_ARCH=$@ TARGET=$@ dpkg-buildpackage -T control-stamp; \
+	echo DEB_TARGET_ARCH=$@ TARGET=$@ dpkg-buildpackage -B -uc -us; \
+	cd ..; \
+	done
+	touch $@
+
+
+clean:
+	rm -rf binutils-*
+	rm -rf debian/tmp debian/files
+	find debian -name '*~' | xargs -r rm -f
+	rm -f *.deb *.changes
+	rm -rf repackfiles tmp
+	rm -rf $(stamp)
+	mkdir $(stamp)
+
+
+#
+# Repack resulting packages to make some changes;
+# - Set Source and Version to this package 
+define repack_debs
+	@for deb in $1; \
+	do \
+	    echo "repack $$deb ..."; \
+	    rm -rf tmp/*; \
+	    dpkg-deb -x $$deb tmp; \
+	    dpkg-deb -e $$deb tmp/DEBIAN; \
+	    pkgname=`echo $$deb | cut -d'_' -f1`; \
+	    sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
+	    if [ -e debian/overrides/$$pkgname ]; then \
+		  mkdir -p tmp/usr/share/lintian/overrides; \
+		  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
+	    fi; \
+	    if [ 'libc6-armel-cross' = $$pkgname ]; then \
+	          sed -i -e'/^Depends/d' tmp/DEBIAN/control; \
+	    fi; \
+ 	    (cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
+	    newdeb=`echo $$deb|sed -e "s/\(.*\)_\(.*\)_\(.*\)/\1_\2cross${DEB_VER_ACT}_\3/g"`; \
+	    echo "    -> $$newdeb ..."; \
+	    PKG_IGNORE_CURRENTLY_BUILDING=1 dpkg-deb -b tmp/ ../$$newdeb; \
+	    echo "        done"; \
+	    rm -rf tmp/*; \
+	done
+endef
+
+repack-debs:
+	@echo START $@
+	install -d repackfiles
+	dpkg-deb -x binutils-*.deb  repackfiles
+	$(call repack_debs, $(wildcard *.deb))
+
+build-arch: build
+build-indep: 
+build: $(stamp)build-armhf $(stamp)build-armel
+	# we do not need those packages
+	#rm -f *-doc*.*deb
+	#rm -f *-source*.*deb
+
+binary: binary-arch binary-indep 
+binary-arch:  build-arch mangle-debian-files
+binary-indep:
+
+
+$(stamp)debian-files-base:
+	@echo START $@
+	rm -f debian/files
+	touch $@
+
+define generate_debian_files
+	@echo Debs: $1
+	@for deb in $1; \
+	do \
+		echo -n "`basename $$deb` " >>debian/files; \
+		dpkg-deb -I $$deb | grep Section  | cut -d ' ' -f 3 | tr "\n" ' ' >>debian/files; \
+		dpkg-deb -I $$deb | grep Priority | cut -d ' ' -f 3 | tr -d "\n" >>debian/files; \
+		echo "" >>debian/files; \
+	done
+endef
+
+mangle-debian-files: $(stamp)debian-files-base repack-debs
+	@echo START $@
+	$(call generate_debian_files,  $(wildcard *.deb))
+	sed -i -e "s/_all.deb/cross${DEB_VER_ACT}_all.deb/g" debian/files
+	sed -i -e "s/_${HOST_ARCH}.deb/cross${DEB_VER_ACT}_${HOST_ARCH}.deb/g" debian/files
+	sed -i -e "s/cross${DEB_VER_ACT}cross${DEB_VER_ACT}/cross${DEB_VER_ACT}/g" debian/files
+
+
+control:
+	cat debian/control.head.in > debian/control; \
+	for targetarch in $(TARGET_LIST); do \
+	    sed -e "s/TARGET/$${targetarch}/g" debian/control.body.in >> debian/control; \
+	done

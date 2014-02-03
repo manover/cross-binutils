@@ -1,0 +1,11 @@
+Package: binutils-TARGET-cross
+Architecture: any
+Section: devel
+Depends: ${misc:Depends}
+Description: Cross-binutils (assembler, linker etc) targetting TARGET
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building TARGET binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources. 
+
