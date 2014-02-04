@@ -63,7 +63,7 @@ $(stamp)armel $(stamp)armhf: $(stamp)init
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS}; \
 	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -T control-stamp; \
-	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -B -uc -us; \
+	WITH_SYSROOT=/ DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -B -uc -us; \
 	cd ..; \
 	touch $@
 
