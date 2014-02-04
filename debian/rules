@@ -82,7 +82,7 @@ clean:
 # Repack resulting packages to make changes:
 # - Set Source and Version to this package 
 define repack_debs
-	@for deb in $1; \
+	for deb in $1; \
 	do \
 	    echo "repacking $$deb ..."; \
 	    rm -rf tmp/*; \
@@ -90,8 +90,7 @@ define repack_debs
 	    dpkg-deb -e $$deb tmp/DEBIAN; \
 	    pkgname=`echo $$deb | cut -d'_' -f1`; \
 	    sed -i -e's/^Source:.*/Source: ${THIS_PKG}/' tmp/DEBIAN/control; \
-	    sed -i -e's/^Version:.*/Version: ${THIS_PKG_VER}/' tmp/DEBIAN/control; \
-	    sed -i -e's/^Built-Using:.*/Built-Using: binutils (=${DEB_VER_BINUTILS})/' tmp/DEBIAN/control; \
+	    sed -i -e's/^Version:.*/Version: ${THIS_PKG_VER}\nBuilt-Using: binutils (=${DEB_VER_BINUTILS})/' tmp/DEBIAN/control; \
 	    if [ -e debian/overrides/$$pkgname ]; then \
 		  mkdir -p tmp/usr/share/lintian/overrides; \
 		  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
@@ -105,8 +104,11 @@ endef
 
 repack-debs:
 	@echo START $@
-	install -d repackfiles
-	dpkg-deb -x binutils-*.deb  repackfiles
+	install -d repackfiles; \
+	for deb in $(wildcard *.deb); \
+	do \
+	  dpkg-deb -x $${deb}  repackfiles; \
+	done; \
 	$(call repack_debs, $(wildcard *.deb))
 
 build-arch: build
