@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Wookey <wookey@wookware.org>
 Standards-Version: 3.9.5
 Build-Depends: dpkg-dev, dpkg,
-  binutils-source (>= 2.20), autoconf (>= 2.64),
+  binutils-source, autoconf (>=2.64),
   bison, flex, gettext, texinfo, quilt, lsb-release,
   sed, tar, xz-utils, python3:any, zlib1g-dev
 

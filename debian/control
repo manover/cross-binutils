@@ -4,28 +4,30 @@ Priority: extra
 Maintainer: Wookey <wookey@wookware.org>
 Standards-Version: 3.9.5
 Build-Depends: dpkg-dev, dpkg,
-  binutils-source (>= 2.20), autoconf (>= 2.64),
+  binutils-source, autoconf (>=2.64),
   bison, flex, gettext, texinfo, quilt, lsb-release,
   sed, tar, xz-utils, python3:any, zlib1g-dev
 
-Package: binutils-armel-cross
-Architecture: any
+Package: binutils-arm-linux-gnueabihf
+Architecture: amd64
 Section: devel
 Depends: ${misc:Depends}
-Description: Cross-binutils (assembler, linker etc) targetting armel
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting armhf
  This package is the GNU binutils (assembler, linker, strip etc) built
- for cross-building armel binaries/packages
+ for cross-building armhf binaries/packages
  .
  It is built by the cross-binutils package from the normal binutils
  sources. 
 
-Package: binutils-armhf-cross
-Architecture: any
+Package: binutils-arm-linux-gnueabi
+Architecture: amd64
 Section: devel
 Depends: ${misc:Depends}
-Description: Cross-binutils (assembler, linker etc) targetting armhf
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting armel
  This package is the GNU binutils (assembler, linker, strip etc) built
- for cross-building armhf binaries/packages
+ for cross-building armel binaries/packages
  .
  It is built by the cross-binutils package from the normal binutils
  sources. 

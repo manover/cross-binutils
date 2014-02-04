@@ -6,10 +6,7 @@ PF ?= usr
 THIS_PKG         := $(shell dpkg-parsechangelog| sed -n 's/-*//; s/^Source: \(.*\)/\1/p')
 THIS_PKG_VER     := $(shell dpkg-parsechangelog| sed -n 's/^Version: \(.*\)/\1/p')
 
-TARGET_GNU_TYPE   := $(shell dpkg-architecture -a${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f)
-HOST_ARCH        := $(shell dpkg-architecture -qDEB_HOST_ARCH)
-HOST_GNU_TYPE    := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-BUILD_ARCH       := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_HOST_ARCH    := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 stamp            := stamp-dir/
 
 DISTRO ?= $(shell lsb_release -is)
@@ -39,16 +36,14 @@ endef
 info:
 	@echo "Binutils version:         ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
 	@echo
-	@echo "Target architecture list: ${TARGET_LIST}"     
-	@echo "Host architecture:        ${HOST_ARCH}"
-	@echo "Host GNU type:            ${HOST_GNU_TYPE}"
+	@echo "Target architecture list: ${DEB_TARGET_LIST}"     
+	@echo "Host architecture:        ${DEB_HOST_ARCH}"
 
 $(stamp)init-dirs:
 	mkdir debian/tmp -p
 	touch $@
 
 init: $(stamp)init
-
 
 $(stamp)init:
 	@echo START $@
@@ -63,11 +58,11 @@ $(stamp)init:
 
 	touch $@
 
-$(stamp)build-armel $(stamp)build-armhf: $(stamp)init 
+$(stamp)armel $(stamp)armhf: $(stamp)init 
 	@echo START $@
 	cd binutils-${PKG_VER_BINUTILS}; \
-	echo DEB_TARGET_ARCH=$@ TARGET=$@ dpkg-buildpackage -T control-stamp; \
-	echo DEB_TARGET_ARCH=$@ TARGET=$@ dpkg-buildpackage -B -uc -us; \
+	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -T control-stamp; \
+	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -B -uc -us; \
 	cd ..; \
 	done
 	touch $@
@@ -84,28 +79,25 @@ clean:
 
 
 #
-# Repack resulting packages to make some changes;
+# Repack resulting packages to make changes:
 # - Set Source and Version to this package 
 define repack_debs
 	@for deb in $1; \
 	do \
-	    echo "repack $$deb ..."; \
+	    echo "repacking $$deb ..."; \
 	    rm -rf tmp/*; \
 	    dpkg-deb -x $$deb tmp; \
 	    dpkg-deb -e $$deb tmp/DEBIAN; \
 	    pkgname=`echo $$deb | cut -d'_' -f1`; \
-	    sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
+	    sed -i -e's/^Source:.*/Source: ${THIS_PKG}/' tmp/DEBIAN/control; \
+	    sed -i -e's/^Version:.*/Version: ${THIS_PKG_VER}/' tmp/DEBIAN/control; \
+	    sed -i -e's/^Built-Using:.*/Built-Using: binutils (=${DEB_VER_BINUTILS})/' tmp/DEBIAN/control; \
 	    if [ -e debian/overrides/$$pkgname ]; then \
 		  mkdir -p tmp/usr/share/lintian/overrides; \
 		  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
 	    fi; \
-	    if [ 'libc6-armel-cross' = $$pkgname ]; then \
-	          sed -i -e'/^Depends/d' tmp/DEBIAN/control; \
-	    fi; \
  	    (cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
-	    newdeb=`echo $$deb|sed -e "s/\(.*\)_\(.*\)_\(.*\)/\1_\2cross${DEB_VER_ACT}_\3/g"`; \
-	    echo "    -> $$newdeb ..."; \
-	    PKG_IGNORE_CURRENTLY_BUILDING=1 dpkg-deb -b tmp/ ../$$newdeb; \
+	    dpkg-deb -b tmp/ ../$$deb; \
 	    echo "        done"; \
 	    rm -rf tmp/*; \
 	done
@@ -119,10 +111,8 @@ repack-debs:
 
 build-arch: build
 build-indep: 
-build: $(stamp)build-armhf $(stamp)build-armel
-	# we do not need those packages
-	#rm -f *-doc*.*deb
-	#rm -f *-source*.*deb
+build: $(stamp)armhf $(stamp)armel
+	rm -f *.changes
 
 binary: binary-arch binary-indep 
 binary-arch:  build-arch mangle-debian-files
@@ -148,13 +138,13 @@ endef
 mangle-debian-files: $(stamp)debian-files-base repack-debs
 	@echo START $@
 	$(call generate_debian_files,  $(wildcard *.deb))
-	sed -i -e "s/_all.deb/cross${DEB_VER_ACT}_all.deb/g" debian/files
-	sed -i -e "s/_${HOST_ARCH}.deb/cross${DEB_VER_ACT}_${HOST_ARCH}.deb/g" debian/files
-	sed -i -e "s/cross${DEB_VER_ACT}cross${DEB_VER_ACT}/cross${DEB_VER_ACT}/g" debian/files
+	#sed -i -e "s/_${DEB_HOST_ARCH}.deb/cross${THIS_PKG_VER}_${DEB_HOST_ARCH}.deb/g" debian/files
 
 
 control:
 	cat debian/control.head.in > debian/control; \
-	for targetarch in $(TARGET_LIST); do \
-	    sed -e "s/TARGET/$${targetarch}/g" debian/control.body.in >> debian/control; \
+	for DEB_TARGET_ARCH in $(TARGET_LIST); do \
+	    DEB_TARGET_GNU_TYPE=`dpkg-architecture -a$${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f 2>/dev/null`; \
+	    sed -e "s/DEB_TARGET_ARCH/$${DEB_TARGET_ARCH}/g" debian/control.body.in | \
+	    sed -e "s/DEB_TARGET_GNU_TYPE/$${DEB_TARGET_GNU_TYPE}/g" >> debian/control; \
 	done
