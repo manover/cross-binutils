@@ -60,11 +60,11 @@ $(stamp)init:
 
 $(stamp)armel $(stamp)armhf: $(stamp)init 
 	@echo START $@
+	set -e; \
 	cd binutils-${PKG_VER_BINUTILS}; \
 	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -T control-stamp; \
 	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -B -uc -us; \
 	cd ..; \
-	done
 	touch $@
 
 
@@ -89,8 +89,9 @@ define repack_debs
 	    dpkg-deb -x $$deb tmp; \
 	    dpkg-deb -e $$deb tmp/DEBIAN; \
 	    pkgname=`echo $$deb | cut -d'_' -f1`; \
-	    sed -i -e's/^Source:.*/Source: ${THIS_PKG}/' tmp/DEBIAN/control; \
-	    sed -i -e's/^Version:.*/Version: ${THIS_PKG_VER}\nBuilt-Using: binutils (=${DEB_VER_BINUTILS})/' tmp/DEBIAN/control; \
+            sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control | \
+	    sed -i -e'3 a\
+	    Built-Using: binutils (=${DEB_VER_BINUTILS})' tmp/DEBIAN/control; \
 	    if [ -e debian/overrides/$$pkgname ]; then \
 		  mkdir -p tmp/usr/share/lintian/overrides; \
 		  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
@@ -98,7 +99,6 @@ define repack_debs
  	    (cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
 	    dpkg-deb -b tmp/ ../$$deb; \
 	    echo "        done"; \
-	    rm -rf tmp/*; \
 	done
 endef
 
@@ -140,7 +140,6 @@ endef
 mangle-debian-files: $(stamp)debian-files-base repack-debs
 	@echo START $@
 	$(call generate_debian_files,  $(wildcard *.deb))
-	#sed -i -e "s/_${DEB_HOST_ARCH}.deb/cross${THIS_PKG_VER}_${DEB_HOST_ARCH}.deb/g" debian/files
 
 
 control:
