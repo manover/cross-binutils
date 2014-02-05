@@ -19,13 +19,15 @@ DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 BINUTILS_DIR  := /usr/src/binutils
 
 ifeq ($(DISTRO),Debian)
-ALL_TARGETS := armhf armel arm64 mips mipsel powerpc i386 amd64
+TARGET_LIST ?= armhf armel arm64 mips mipsel powerpc i386 amd64
+HOST_LIST ?= amd64 i386
 else # Ubuntu
-ALL_TARGETS := armhf armel arm64
+TARGET_LIST ?= armhf armel arm64
+HOST_LIST ?= amd64 i386
 endif
 
 # Don't try to build the HOST=TARGET (ie. non-cross) combination for this arch
-TARGET_LIST := $(filter-out ${DEB_HOST_ARCH}, ${ALL_TARGETS})
+TARGETS := $(filter-out ${DEB_HOST_ARCH}, ${TARGET_LIST})
 
 
 # taken from gcc packaging
@@ -36,7 +38,7 @@ endef
 info:
 	@echo "Binutils version:         ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
 	@echo
-	@echo "Target architecture list: ${DEB_TARGET_LIST}"     
+	@echo "Target architecture list: ${TARGETS}"     
 	@echo "Host architecture:        ${DEB_HOST_ARCH}"
 
 $(stamp)init-dirs:
@@ -54,16 +56,15 @@ $(stamp)init:
 	if [ -n "$$(grep -v '^\#' ${CURDIR}/debian/patches/binutils/series)" ]; then \
 	  QUILT_PATCHES=${CURDIR}/debian/patches/binutils quilt push -a; \
 	fi; \
-	echo ${DEB_TARGET_ARCH} > debian/target;
 
 	touch $@
 
-$(stamp)armel $(stamp)armhf: $(stamp)init 
+$(stamp)build-%: $(stamp)init
 	@echo START $@
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS}; \
-	DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -T control-stamp; \
-	WITH_SYSROOT=/ DEB_TARGET_ARCH=$(@F) TARGET=$(@F) dpkg-buildpackage -B -uc -us; \
+	DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -T control-stamp; \
+	WITH_SYSROOT=/ DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -B -uc -us; \
 	cd ..; \
 	touch $@
 
@@ -108,9 +109,11 @@ repack-debs:
 	  $(call repack_deb, $${deb}) \
 	done; \
 
+BUILD_TARGETS := $(patsubst %,$(stamp)build-%,${TARGETS})
+
 build-arch: build
 build-indep: 
-build: $(stamp)armhf $(stamp)armel
+build: $(BUILD_TARGETS)
 	rm -f *.changes
 
 binary: binary-arch binary-indep 
@@ -139,10 +142,15 @@ mangle-debian-files: $(stamp)debian-files-base repack-debs
 	$(call generate_debian_files,  $(wildcard *.deb))
 
 
+# Generate the control file from head plus stanza for each binary
+# Don't build binaries when HOST=TARGET
+
 control:
-	cat debian/control.head.in > debian/control; \
+	cat debian/control.head.in > debian/control;
 	for DEB_TARGET_ARCH in $(TARGET_LIST); do \
 	    DEB_TARGET_GNU_TYPE=`dpkg-architecture -a$${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f 2>/dev/null`; \
-	    sed -e "s/DEB_TARGET_ARCH/$${DEB_TARGET_ARCH}/g" debian/control.body.in | \
+	    ARCH_LIST_FOR_BINARY=`echo ${HOST_LIST} | sed "s/ *$${DEB_TARGET_ARCH} *//"`; \
+	    sed -e "s/DEB_TARGET_ARCH/$${DEB_TARGET_ARCH}/g" debian/control.binary.in | \
+	    sed -e "s/ARCH_LIST_FOR_BINARY/$${ARCH_LIST_FOR_BINARY}/g" | \
 	    sed -e "s/DEB_TARGET_GNU_TYPE/$${DEB_TARGET_GNU_TYPE}/g" >> debian/control; \
 	done

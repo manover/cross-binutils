@@ -4,6 +4,13 @@ binutils-source package)
 
 All the supported binutils cross-targets are built by this package.
 
-To change the set of target archtectures built edit TARGET_LIST in the
-rules file and regenerate the control file with 
+Changing the set of TARGET archtectures built, or the set of HOST
+architectures they are built for, set the TARGET_LIST and HOST_LIST
+variables respectively, then run:
 debian/rules control
+
+You can either set them on the command line, or change them in the
+rules file.
+
+e.g (if just overriding on the command line):
+TARGET_LIST="armel armhf" HOST_LIST="amd64" debian/rules control

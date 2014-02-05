@@ -4,12 +4,14 @@ Priority: extra
 Maintainer: Wookey <wookey@wookware.org>
 Standards-Version: 3.9.5
 Build-Depends: dpkg-dev, dpkg,
-  binutils-source, autoconf (>=2.64),
+  binutils-source, autoconf (>=2.64), dejagnu
   bison, flex, gettext, texinfo, quilt, lsb-release,
   sed, tar, xz-utils, python3:any, zlib1g-dev
+Vcs-Browser: https://alioth.debian.org/plugins/scmgit/cgi-bin/gitweb.cgi?p=crosstoolchain/crosstoolchain.git;a=tree
+Vcs-Git: https://alioth.debian.org/anonscm/git/crosstoolchain/crosstoolchain.git
 
 Package: binutils-arm-linux-gnueabihf
-Architecture: amd64
+Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
 Built-Using: binutils-BINUTILS.VER
@@ -18,10 +20,10 @@ Description: Cross-binutils (assembler, linker etc) targetting armhf
  for cross-building armhf binaries/packages
  .
  It is built by the cross-binutils package from the normal binutils
- sources. 
+ sources.
 
 Package: binutils-arm-linux-gnueabi
-Architecture: amd64
+Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
 Built-Using: binutils-BINUTILS.VER
@@ -30,5 +32,77 @@ Description: Cross-binutils (assembler, linker etc) targetting armel
  for cross-building armel binaries/packages
  .
  It is built by the cross-binutils package from the normal binutils
- sources. 
+ sources.
+
+Package: binutils-aarch64-linux-gnu
+Architecture: amd64 i386
+Section: devel
+Depends: ${misc:Depends}
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting arm64
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building arm64 binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
+
+Package: binutils-mips-linux-gnu
+Architecture: amd64 i386
+Section: devel
+Depends: ${misc:Depends}
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting mips
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building mips binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
+
+Package: binutils-mipsel-linux-gnu
+Architecture: amd64 i386
+Section: devel
+Depends: ${misc:Depends}
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting mipsel
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building mipsel binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
+
+Package: binutils-powerpc-linux-gnu
+Architecture: amd64 i386
+Section: devel
+Depends: ${misc:Depends}
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting powerpc
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building powerpc binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
+
+Package: binutils-i486-linux-gnu
+Architecture: amd64
+Section: devel
+Depends: ${misc:Depends}
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting i386
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building i386 binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
+
+Package: binutils-x86_64-linux-gnu
+Architecture: i386
+Section: devel
+Depends: ${misc:Depends}
+Built-Using: binutils-BINUTILS.VER
+Description: Cross-binutils (assembler, linker etc) targetting amd64
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building amd64 binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
 
