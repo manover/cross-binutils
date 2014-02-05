@@ -19,15 +19,14 @@ DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 BINUTILS_DIR  := /usr/src/binutils
 
 ifeq ($(DISTRO),Debian)
-
-TARGET_LIST := armhf armel
-#TARGET_LIST := armhf armel mips mipsel i386 amd64
-
+ALL_TARGETS := armhf armel arm64 mips mipsel powerpc i386 amd64
 else # Ubuntu
-
-TARGET_LIST := armhf armel arm64
-
+ALL_TARGETS := armhf armel arm64
 endif
+
+# Don't try to build the HOST=TARGET (ie. non-cross) combination for this arch
+TARGET_LIST := $(filter-out ${DEB_HOST_ARCH}, ${ALL_TARGETS})
+
 
 # taken from gcc packaging
 define unpack_tarball
@@ -89,7 +88,7 @@ define repack_deb
 	dpkg-deb -e $$deb tmp/DEBIAN; \
 	pkgname=`echo $$deb | cut -d'_' -f1`; \
         sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
-        sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nXB-Built-Using-&/' tmp/DEBIAN/control; \
+        sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nXB-Original-Source-&/' tmp/DEBIAN/control; \
 	sed -i -e'3 a\
 	Built-Using: binutils (=${DEB_VER_BINUTILS})' tmp/DEBIAN/control; \
 	if [ -e debian/overrides/$$pkgname ]; then \
