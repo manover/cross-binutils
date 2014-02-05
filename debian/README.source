@@ -3,3 +3,7 @@ It build-depends on the binutils source and uses that (via the
 binutils-source package)
 
 All the supported binutils cross-targets are built by this package.
+
+To change the set of target archtectures built edit TARGET_LIST in the
+rules file and regenerate the control file with 
+debian/rules control
