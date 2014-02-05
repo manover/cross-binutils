@@ -5,6 +5,7 @@ PF ?= usr
 
 THIS_PKG         := $(shell dpkg-parsechangelog| sed -n 's/-*//; s/^Source: \(.*\)/\1/p')
 THIS_PKG_VER     := $(shell dpkg-parsechangelog| sed -n 's/^Version: \(.*\)/\1/p')
+THIS_PKG_MAINT   := $(shell dpkg-parsechangelog| sed -n 's/^Maintainer: \(.*\)/\1/p')
 
 DEB_HOST_ARCH    := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 stamp            := stamp-dir/
@@ -81,25 +82,23 @@ clean:
 #
 # Repack resulting packages to make changes:
 # - Set Source and Version to this package 
-define repack_debs
-	for deb in $1; \
-	do \
-	    echo "repacking $$deb ..."; \
-	    rm -rf tmp/*; \
-	    dpkg-deb -x $$deb tmp; \
-	    dpkg-deb -e $$deb tmp/DEBIAN; \
-	    pkgname=`echo $$deb | cut -d'_' -f1`; \
-            sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control | \
-	    sed -i -e'3 a\
-	    Built-Using: binutils (=${DEB_VER_BINUTILS})' tmp/DEBIAN/control; \
-	    if [ -e debian/overrides/$$pkgname ]; then \
-		  mkdir -p tmp/usr/share/lintian/overrides; \
-		  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
-	    fi; \
- 	    (cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
-	    dpkg-deb -b tmp/ ../$$deb; \
-	    echo "        done"; \
-	done
+define repack_deb
+	echo "repacking $$deb ..."; \
+	rm -rf tmp/*; \
+	dpkg-deb -x $$deb tmp; \
+	dpkg-deb -e $$deb tmp/DEBIAN; \
+	pkgname=`echo $$deb | cut -d'_' -f1`; \
+        sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
+        sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nXB-Built-Using-&/' tmp/DEBIAN/control; \
+	sed -i -e'3 a\
+	Built-Using: binutils (=${DEB_VER_BINUTILS})' tmp/DEBIAN/control; \
+	if [ -e debian/overrides/$$pkgname ]; then \
+	  mkdir -p tmp/usr/share/lintian/overrides; \
+	  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
+	fi; \
+ 	(cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
+	dpkg-deb -b tmp/ ../$$deb; \
+	echo "        done";
 endef
 
 repack-debs:
@@ -107,9 +106,8 @@ repack-debs:
 	install -d repackfiles; \
 	for deb in $(wildcard *.deb); \
 	do \
-	  dpkg-deb -x $${deb}  repackfiles; \
+	  $(call repack_deb, $${deb}) \
 	done; \
-	$(call repack_debs, $(wildcard *.deb))
 
 build-arch: build
 build-indep: 
