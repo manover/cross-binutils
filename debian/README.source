@@ -4,7 +4,7 @@ binutils-source package)
 
 All the supported binutils cross-targets are built by this package.
 
-Changing the set of TARGET archtectures built, or the set of HOST
+Changing the set of TARGET architectures built, or the set of HOST
 architectures they are built for, set the TARGET_LIST and HOST_LIST
 variables respectively, then run:
 debian/rules control
