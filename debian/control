@@ -7,8 +7,8 @@ Build-Depends: dpkg-dev, dpkg,
   binutils-source, autoconf (>=2.64), dejagnu
   bison, flex, gettext, texinfo, quilt, lsb-release,
   sed, tar, xz-utils, python3:any, zlib1g-dev
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=crosstoolchain/crosstoolchain.git
-Vcs-Git: git://git.debian.org/git/crosstoolchain/crosstoolchain
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=crosstoolchain/cross-binutils.git
+Vcs-Git: git://git.debian.org/git/crosstoolchain/cross-binutils
 
 Package: binutils-arm-linux-gnueabihf
 Architecture: amd64 i386
