@@ -96,7 +96,7 @@ define repack_deb
 	  mkdir -p tmp/usr/share/lintian/overrides; \
 	  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
 	fi; \
- 	(cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
+	(cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
 	dpkg-deb -b tmp/ ../$$deb; \
 	echo "        done";
 endef
