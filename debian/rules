@@ -1,14 +1,12 @@
 #!/usr/bin/make -f
 
-# prefix for builds - without leading slash
-PF ?= usr
 
 THIS_PKG         := $(shell dpkg-parsechangelog| sed -n 's/-*//; s/^Source: \(.*\)/\1/p')
 THIS_PKG_VER     := $(shell dpkg-parsechangelog| sed -n 's/^Version: \(.*\)/\1/p')
 THIS_PKG_MAINT   := $(shell dpkg-parsechangelog| sed -n 's/^Maintainer: \(.*\)/\1/p')
 
 DEB_HOST_ARCH    := $(shell dpkg-architecture -qDEB_HOST_ARCH)
-stamp            := stamp-dir/
+stamp            := stamp/
 
 DISTRO ?= $(shell lsb_release -is)
 
@@ -32,26 +30,18 @@ endif
 TARGETS := $(filter-out ${DEB_HOST_ARCH}, ${TARGET_LIST})
 
 
-# taken from gcc packaging
-define unpack_tarball
-	tar -x -f $1
-endef
-
 info:
 	@echo "Binutils version:         ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
 	@echo
 	@echo "Target architecture list: ${TARGETS}"     
 	@echo "Host architecture:        ${DEB_HOST_ARCH}"
 
-$(stamp)init-dirs:
-	mkdir debian/tmp -p
-	touch $@
-
 init: $(stamp)init
 
 $(stamp)init:
 	@echo START $@
-	$(call unpack_tarball, ${BINUTILS_DIR}/binutils-${VER_BINUTILS}.tar.xz)
+	mkdir debian/tmp -p
+	tar -x -f  ${BINUTILS_DIR}/binutils-${VER_BINUTILS}.tar.xz
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS} ;\
 	cp -a ${BINUTILS_DIR}/debian/ . ;\
@@ -72,11 +62,11 @@ $(stamp)build-%: $(stamp)init
 
 
 clean:
+	rm -rf repackfiles tmp
 	rm -rf binutils-*
 	rm -rf debian/tmp debian/files
-	find debian -name '*~' | xargs -r rm -f
+	find debian -name '*~' -print0 | xargs -0 -r rm -f
 	rm -f *.deb *.changes
-	rm -rf repackfiles tmp
 	rm -rf $(stamp)
 	mkdir $(stamp)
 
@@ -123,25 +113,20 @@ binary-arch:  build-arch mangle-debian-files
 binary-indep:
 
 
-$(stamp)debian-files-base:
+$(stamp)debian-files:
 	@echo START $@
 	rm -f debian/files
 	touch $@
 
-define generate_debian_files
-	@echo Debs: $1
-	@for deb in $1; \
+mangle-debian-files: $(stamp)debian-files repack-debs
+	@echo START $@
+	@for deb in $(wildcard *.deb); \
 	do \
 		echo -n "`basename $$deb` " >>debian/files; \
 		dpkg-deb -I $$deb | grep Section  | cut -d ' ' -f 3 | tr "\n" ' ' >>debian/files; \
 		dpkg-deb -I $$deb | grep Priority | cut -d ' ' -f 3 | tr -d "\n" >>debian/files; \
 		echo "" >>debian/files; \
 	done
-endef
-
-mangle-debian-files: $(stamp)debian-files-base repack-debs
-	@echo START $@
-	$(call generate_debian_files,  $(wildcard *.deb))
 
 
 # Generate the control file from head plus stanza for each binary

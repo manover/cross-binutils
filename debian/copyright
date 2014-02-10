@@ -1,6 +1,5 @@
-This package was made by Wookey <wookey@wookware.org>.  The structure
-was derived from the <arch>-cross-toolchain-base package by Marcin
-Juskiewicz.
+This package was made by Wookey <wookey@wookware.org>. Thanks to 
+Marcin Juszkiewicz for a couple of nifty ideas.
 
 These scripts are free software; you can redistribute it and/or modify it
 under the terms of the GPLv2 or later
@@ -8,7 +7,6 @@ under the terms of the GPLv2 or later
 Files: *
 Licence: GPL-2+
 Copyright:   Copyright 2014 Wookey <wookey@debian.org>
-             Copyright 2010 Marcin Juskiewicz <marcin.juskiewicz@linaro.org>
 
 License:
 	     
