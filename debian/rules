@@ -11,7 +11,6 @@ stamp            := stamp/
 DISTRO ?= $(shell lsb_release -is)
 
 
-$(if $(wildcard /usr/src/binutils/debian/changelog),,$(error Please install the 'binutils-source' package. This is required))
 VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-'|cut -d '.' -f1-3)
 PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-')
 DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' ')
