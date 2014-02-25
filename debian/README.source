@@ -14,3 +14,9 @@ rules file.
 
 e.g (if just overriding on the command line):
 TARGET_LIST="armel armhf" HOST_LIST="amd64" debian/rules control
+
+Once the debian/control file is generated the package can be built. Note that it
+is currently necessary to define TARGET_LIST and HOST_LIST when building the
+package as well as when building debian/control
+
+ -- Dima Kogan <dima@oblong.com>, Tue, 25 Feb 2014 11:41:50 -0800
