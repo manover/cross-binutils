@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+HOST_LIST ?= amd64 i386
+
 
 THIS_PKG         := $(shell dpkg-parsechangelog| sed -n 's/-*//; s/^Source: \(.*\)/\1/p')
 THIS_PKG_VER     := $(shell dpkg-parsechangelog| sed -n 's/^Version: \(.*\)/\1/p')
@@ -8,8 +10,6 @@ THIS_PKG_MAINT   := $(shell dpkg-parsechangelog| sed -n 's/^Maintainer: \(.*\)/\
 DEB_HOST_ARCH    := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 stamp            := stamp/
 
-DISTRO ?= $(shell lsb_release -is)
-
 
 VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-'|cut -d '.' -f1-3)
 PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-')
@@ -17,23 +17,13 @@ DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 
 BINUTILS_DIR  := /usr/src/binutils
 
-ifeq ($(DISTRO),Debian)
-TARGET_LIST ?= armhf armel arm64 mips mipsel powerpc i386 amd64
-HOST_LIST ?= amd64 i386
-else # Ubuntu
-TARGET_LIST ?= armhf armel arm64
-HOST_LIST ?= amd64 i386
-endif
-
-# Don't try to build the HOST=TARGET (ie. non-cross) combination for this arch
-TARGETS := $(filter-out ${DEB_HOST_ARCH}, ${TARGET_LIST})
 
 
 info:
-	@echo "Binutils version:         ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
+	@echo "Binutils version:     ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
 	@echo
-	@echo "Target architecture list: ${TARGETS}"     
-	@echo "Host architecture:        ${DEB_HOST_ARCH}"
+	@echo "Target architecture:  ${DEB_TARGET_ARCH}"
+	@echo "Host architecture:    ${DEB_HOST_ARCH}"
 
 init: $(stamp)init
 
@@ -50,12 +40,12 @@ $(stamp)init:
 
 	touch $@
 
-$(stamp)build-%: $(stamp)init
+$(stamp)build: $(stamp)init
 	@echo START $@
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS}; \
-	DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -T control-stamp; \
-	WITH_SYSROOT=/ DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -B -uc -us; \
+	TARGET=${DEB_TARGET_ARCH} dpkg-buildpackage -T control-stamp; \
+	WITH_SYSROOT=/ TARGET=${DEB_TARGET_ARCH} dpkg-buildpackage -B -uc -us; \
 	cd ..; \
 	touch $@
 
@@ -72,7 +62,7 @@ clean:
 
 #
 # Repack resulting packages to make changes:
-# - Set Source and Version to this package 
+# - Set Source and Version to this package
 define repack_deb
 	echo "repacking $$deb ..."; \
 	rm -rf tmp/*; \
@@ -100,14 +90,12 @@ repack-debs:
 	  $(call repack_deb, $${deb}) \
 	done; \
 
-BUILD_TARGETS := $(patsubst %,$(stamp)build-%,${TARGETS})
-
 build-arch: build
-build-indep: 
-build: $(BUILD_TARGETS)
+build-indep:
+build: $(stamp)build
 	rm -f *.changes
 
-binary: binary-arch binary-indep 
+binary: binary-arch binary-indep
 binary-arch:  build-arch mangle-debian-files
 binary-indep:
 
@@ -132,11 +120,9 @@ mangle-debian-files: $(stamp)debian-files repack-debs
 # Don't build binaries when HOST=TARGET
 
 control:
-	cat debian/control.head.in > debian/control;
-	for DEB_TARGET_ARCH in $(TARGET_LIST); do \
-	    DEB_TARGET_GNU_TYPE=`dpkg-architecture -a$${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f 2>/dev/null`; \
-	    ARCH_LIST_FOR_BINARY=`echo ${HOST_LIST} | sed "s/ *$${DEB_TARGET_ARCH} *//"`; \
-	    sed -e "s/DEB_TARGET_ARCH/$${DEB_TARGET_ARCH}/g" debian/control.binary.in | \
-	    sed -e "s/ARCH_LIST_FOR_BINARY/$${ARCH_LIST_FOR_BINARY}/g" | \
-	    sed -e "s/DEB_TARGET_GNU_TYPE/$${DEB_TARGET_GNU_TYPE}/g" >> debian/control; \
-	done
+	(cat debian/control.head.in; echo) > debian/control;
+	DEB_TARGET_GNU_TYPE=`dpkg-architecture -a$${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f 2>/dev/null`; \
+	ARCH_LIST_FOR_BINARY=`echo ${HOST_LIST} | sed "s/ *$${DEB_TARGET_ARCH} *//"`; \
+	sed -e "s/DEB_TARGET_ARCH/$${DEB_TARGET_ARCH}/g" debian/control.binary.in | \
+	sed -e "s/ARCH_LIST_FOR_BINARY/$${ARCH_LIST_FOR_BINARY}/g" | \
+	sed -e "s/DEB_TARGET_GNU_TYPE/$${DEB_TARGET_GNU_TYPE}/g" >> debian/control; \

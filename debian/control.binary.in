@@ -9,4 +9,3 @@ Description: Cross-binutils (assembler, linker etc) targetting DEB_TARGET_ARCH
  .
  It is built by the cross-binutils package from the normal binutils
  sources.
-
