@@ -1,7 +1,7 @@
 Source: cross-binutils
 Section: devel
 Priority: extra
-Maintainer: Wookey <wookey@wookware.org>
+Maintainer: Wookey <wookey@debian.org>
 Standards-Version: 3.9.5
 Build-Depends: binutils-source (>=2.24-4), autoconf (>=2.64), dejagnu, file,
   bison, flex, gettext, texinfo, quilt, lsb-release,
