@@ -1,7 +1,7 @@
 Source: cross-binutils
 Section: devel
 Priority: extra
-Maintainer: Wookey <wookey@wookware.org>
+Maintainer: Wookey <wookey@debian.org>
 Standards-Version: 3.9.5
 Build-Depends: dpkg-dev, dpkg,
   binutils-source, autoconf (>=2.64), dejagnu, file,

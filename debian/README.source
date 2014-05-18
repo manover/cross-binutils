@@ -1,13 +1,16 @@
-This package does not contain the sources used to build the resulting packages. 
-It build-depends on the binutils source and uses that (via the
-binutils-source package)
+This package does not contain the sources used to build the resulting 
+binary packages.  It build-depends on the binutils source and uses
+that (via the binutils-source package). A Built-Using header to
+indicate this is used.
 
-All the supported binutils cross-targets are built by this package.
+All the supported binutils cross-target architectures are built by
+this one package.
 
-Changing the set of TARGET architectures built, or the set of HOST
+To change the set of TARGET architectures built, or the set of HOST
 architectures they are built for, set the TARGET_LIST and HOST_LIST
 variables respectively, then run:
 debian/rules control
+Then build in the normal way.
 
 You can either set them on the command line, or change them in the
 rules file.
