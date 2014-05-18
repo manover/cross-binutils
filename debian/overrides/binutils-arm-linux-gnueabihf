@@ -1,2 +1,0 @@
-binutils-arm-linux-gnueabihf: non-standard-dir-in-usr usr/arm-linux-gnueabihf/
-binutils-arm-linux-gnueabihf: non-standard-dir-in-usr usr/x86_64-linux-gnu/
