@@ -13,7 +13,6 @@ DISTRO ?= $(shell lsb_release -is)
 
 VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-'|cut -d '.' -f1-3)
 PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-')
-DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' ')
 
 BINUTILS_DIR  := /usr/src/binutils
 
@@ -29,23 +28,17 @@ endif
 TARGETS := $(filter-out ${DEB_HOST_ARCH}, ${TARGET_LIST})
 
 
-info:
-	@echo "Binutils version:         ${VER_BINUTILS}	${DEB_VER_BINUTILS}	${PKG_VER_BINUTILS}"
-	@echo
-	@echo "Target architecture list: ${TARGETS}"     
-	@echo "Host architecture:        ${DEB_HOST_ARCH}"
-
 init: $(stamp)init
 
 $(stamp)init:
 	@echo START $@
-	mkdir debian/tmp -p
+	mkdir -p debian/tmp $(stamp)
 	tar -x -f  ${BINUTILS_DIR}/binutils-${VER_BINUTILS}.tar.xz
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS} ;\
 	cp -a ${BINUTILS_DIR}/debian/ . ;\
-	if [ -n "$$(grep -v '^\#' ${CURDIR}/debian/patches/binutils/series)" ]; then \
-	  QUILT_PATCHES=${CURDIR}/debian/patches/binutils quilt push -a; \
+	if [ -n "$$(grep -v '^\#' debian/patches/binutils/series)" ]; then \
+	  QUILT_PATCHES=debian/patches/binutils quilt push -a; \
 	fi; \
 
 	touch $@
@@ -61,13 +54,10 @@ $(stamp)build-%: $(stamp)init
 
 
 clean:
-	rm -rf repackfiles tmp
-	rm -rf binutils-*
-	rm -rf debian/tmp debian/files
+	rm -rf repackfiles tmp debian/tmp debian/files 
+	rm -rf binutils-* *.deb *.changes
 	find debian -name '*~' -print0 | xargs -0 -r rm -f
-	rm -f *.deb *.changes
 	rm -rf $(stamp)
-	mkdir $(stamp)
 
 
 #
@@ -81,8 +71,6 @@ define repack_deb
 	pkgname=`echo $$deb | cut -d'_' -f1`; \
         sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
         sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nXB-Original-Source-&/' tmp/DEBIAN/control; \
-	sed -i -e'3 a\
-	Built-Using: binutils (=${DEB_VER_BINUTILS})' tmp/DEBIAN/control; \
 	if [ -e debian/overrides/$$pkgname ]; then \
 	  mkdir -p tmp/usr/share/lintian/overrides; \
 	  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \

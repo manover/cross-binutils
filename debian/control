@@ -14,7 +14,6 @@ Package: binutils-arm-linux-gnueabihf
 Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting armhf
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building armhf binaries/packages
@@ -26,7 +25,6 @@ Package: binutils-arm-linux-gnueabi
 Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting armel
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building armel binaries/packages
@@ -38,7 +36,6 @@ Package: binutils-aarch64-linux-gnu
 Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting arm64
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building arm64 binaries/packages
@@ -50,7 +47,6 @@ Package: binutils-mips-linux-gnu
 Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting mips
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building mips binaries/packages
@@ -62,7 +58,6 @@ Package: binutils-mipsel-linux-gnu
 Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting mipsel
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building mipsel binaries/packages
@@ -74,7 +69,6 @@ Package: binutils-powerpc-linux-gnu
 Architecture: amd64 i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting powerpc
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building powerpc binaries/packages
@@ -86,7 +80,6 @@ Package: binutils-i486-linux-gnu
 Architecture: amd64
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting i386
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building i386 binaries/packages
@@ -98,7 +91,6 @@ Package: binutils-x86_64-linux-gnu
 Architecture: i386
 Section: devel
 Depends: ${misc:Depends}
-Built-Using: binutils-BINUTILS.VER
 Description: Cross-binutils (assembler, linker etc) targetting amd64
  This package is the GNU binutils (assembler, linker, strip etc) built
  for cross-building amd64 binaries/packages
