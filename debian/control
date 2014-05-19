@@ -86,7 +86,7 @@ Description: Cross-binutils (assembler, linker etc) targetting i386
  It is built by the cross-binutils package from the normal binutils
  sources.
 
-Package: binutils-x86_64-linux-gnu
+Package: binutils-x86-64-linux-gnu
 Architecture: i386
 Section: devel
 Depends: ${misc:Depends}
