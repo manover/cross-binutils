@@ -71,6 +71,7 @@ define repack_deb
 	pkgname=`echo $$deb | cut -d'_' -f1`; \
         sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
         sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nXB-Original-Source-&/' tmp/DEBIAN/control; \
+	chmod 644 tmp/DEBIAN/control ; \
 	if [ -e debian/overrides/$$pkgname ]; then \
 	  mkdir -p tmp/usr/share/lintian/overrides; \
 	  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
