@@ -71,12 +71,14 @@ define repack_deb
 	pkgname=`echo $$deb | cut -d'_' -f1`; \
         sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
         sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nXB-Original-Source-&/' tmp/DEBIAN/control; \
-	chmod 644 tmp/DEBIAN/control ; \
 	if [ -e debian/overrides/$$pkgname ]; then \
 	  mkdir -p tmp/usr/share/lintian/overrides; \
 	  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
 	fi; \
-	(cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums);\
+	(cd tmp && md5sum `find usr -type f` >>DEBIAN/md5sums ;\
+	 chmod 644 DEBIAN/md5sums ; \
+        );\
+	find tmp/usr -type d -execdir chmod 755 '{}' \; ;\
 	dpkg-deb -b tmp/ ../$$deb; \
 	echo "        done";
 endef
