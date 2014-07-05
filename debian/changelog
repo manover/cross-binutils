@@ -1,3 +1,11 @@
+cross-binutils (0.2) unstable; urgency=low
+
+  * Remove 'XB-' from 'Original-Source-Maintainer' header, as it
+    does nothing useful
+  * Rebuild with current binutils
+
+ -- wookey <wookey@debian.org>  Sat, 05 Jul 2014 23:55:21 +0100
+
 cross-binutils (0.1) unstable; urgency=low
 
   * Initial release
