@@ -17,7 +17,7 @@ PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 BINUTILS_DIR  := /usr/src/binutils
 
 ifeq ($(DISTRO),Debian)
-TARGET_LIST ?= armhf armel arm64 mips mipsel powerpc i386 amd64
+TARGET_LIST ?= armhf armel arm64 mips mipsel mips64el powerpc i386 amd64
 HOST_LIST ?= amd64 i386
 else # Ubuntu
 TARGET_LIST ?= armhf armel arm64
