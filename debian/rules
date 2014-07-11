@@ -18,10 +18,10 @@ BINUTILS_DIR  := /usr/src/binutils
 
 ifeq ($(DISTRO),Debian)
 TARGET_LIST ?= armhf armel arm64 mips mipsel mips64el powerpc i386 amd64
-HOST_LIST ?= amd64 i386
+HOST_LIST ?= amd64 i386 arm64
 else # Ubuntu
 TARGET_LIST ?= armhf armel arm64
-HOST_LIST ?= amd64 i386
+HOST_LIST ?= amd64 i386 arm64
 endif
 
 # Don't try to build the HOST=TARGET (ie. non-cross) combination for this arch
@@ -121,7 +121,7 @@ mangle-debian-files: $(stamp)debian-files repack-debs
 
 # Generate the control file from head plus stanza for each binary
 # Don't build binaries when HOST=TARGET
-# Ensure no underscores appear in package names
+# Ensure no underscores appear in package names (x86_64-linux-gnu we're looking at you)
 
 control:
 	cat debian/control.head.in > debian/control;

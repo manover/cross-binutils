@@ -1,6 +1,13 @@
+cross-binutils (0.4) unstable; urgency=medium
+
+  * Rebuild with current binutils
+  * Add arm64 as BUILD arch
+
+ -- wookey <wookey@wookware.org>  Fri, 11 Jul 2014 15:34:33 +0000
+
 cross-binutils (0.3) unstable; urgency=low
 
-  * Add mips64el
+  * Add mips64el HOST
 
  -- wookey <wookey@debian.org>  Sun, 06 Jul 2014 22:45:35 +0100
 
