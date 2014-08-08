@@ -128,7 +128,7 @@ control:
 	for DEB_TARGET_ARCH in $(TARGET_LIST); do \
 	    DEB_TARGET_GNU_TYPE=`dpkg-architecture -a$${DEB_TARGET_ARCH} -qDEB_HOST_GNU_TYPE -f 2>/dev/null`; \
 	    TARGET_PACKAGENAME=`echo $${DEB_TARGET_GNU_TYPE} | tr _ -` ; \
-	    ARCH_LIST_FOR_BINARY=`echo ${HOST_LIST} | sed "s/ *$${DEB_TARGET_ARCH} *//"`; \
+	    ARCH_LIST_FOR_BINARY=`echo ${HOST_LIST} | sed "s/ *$${DEB_TARGET_ARCH} */ /"`; \
 	    sed -e "s/DEB_TARGET_ARCH/$${DEB_TARGET_ARCH}/g" debian/control.binary.in | \
 	    sed -e "s/ARCH_LIST_FOR_BINARY/$${ARCH_LIST_FOR_BINARY}/g" | \
 	    sed -e "s/DEB_TARGET_GNU_TYPE/$${TARGET_PACKAGENAME}/g" >> debian/control; \
