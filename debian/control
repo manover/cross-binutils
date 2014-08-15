@@ -10,7 +10,7 @@ Vcs-Browser: http://anonscm.debian.org/gitweb/?p=crosstoolchain/cross-binutils.g
 Vcs-Git: git://git.debian.org/git/crosstoolchain/cross-binutils
 
 Package: binutils-arm-linux-gnueabihf
-Architecture: amd64 i386
+Architecture: amd64 i386 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting armhf
@@ -21,7 +21,7 @@ Description: Cross-binutils (assembler, linker etc) targetting armhf
  sources.
 
 Package: binutils-arm-linux-gnueabi
-Architecture: amd64 i386
+Architecture: amd64 i386 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting armel
@@ -32,7 +32,7 @@ Description: Cross-binutils (assembler, linker etc) targetting armel
  sources.
 
 Package: binutils-aarch64-linux-gnu
-Architecture: amd64 i386
+Architecture: amd64 i386 
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting arm64
@@ -43,7 +43,7 @@ Description: Cross-binutils (assembler, linker etc) targetting arm64
  sources.
 
 Package: binutils-mips-linux-gnu
-Architecture: amd64 i386
+Architecture: amd64 i386 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting mips
@@ -54,7 +54,7 @@ Description: Cross-binutils (assembler, linker etc) targetting mips
  sources.
 
 Package: binutils-mipsel-linux-gnu
-Architecture: amd64 i386
+Architecture: amd64 i386 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting mipsel
@@ -64,8 +64,19 @@ Description: Cross-binutils (assembler, linker etc) targetting mipsel
  It is built by the cross-binutils package from the normal binutils
  sources.
 
+Package: binutils-mips64el-linux-gnuabi64
+Architecture: amd64 i386 arm64
+Section: devel
+Depends: ${misc:Depends}
+Description: Cross-binutils (assembler, linker etc) targetting mips64el
+ This package is the GNU binutils (assembler, linker, strip etc) built
+ for cross-building mips64el binaries/packages
+ .
+ It is built by the cross-binutils package from the normal binutils
+ sources.
+
 Package: binutils-powerpc-linux-gnu
-Architecture: amd64 i386
+Architecture: amd64 i386 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting powerpc
@@ -75,8 +86,8 @@ Description: Cross-binutils (assembler, linker etc) targetting powerpc
  It is built by the cross-binutils package from the normal binutils
  sources.
 
-Package: binutils-i486-linux-gnu
-Architecture: amd64
+Package: binutils-i586-linux-gnu
+Architecture: amd64 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting i386
@@ -87,7 +98,7 @@ Description: Cross-binutils (assembler, linker etc) targetting i386
  sources.
 
 Package: binutils-x86-64-linux-gnu
-Architecture: i386
+Architecture:  i386 arm64
 Section: devel
 Depends: ${misc:Depends}
 Description: Cross-binutils (assembler, linker etc) targetting amd64

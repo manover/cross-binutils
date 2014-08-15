@@ -22,4 +22,9 @@ Once the debian/control file is generated the package can be built. Note that it
 is currently necessary to define TARGET_LIST and HOST_LIST when building the
 package as well as when building debian/control
 
+debian/rules control needs to be re-run whenever the arch lists are
+changed or if dpkg arch names change (e.g i486-linux-gnu ->
+i586-linux-gnu). Note that in the latter case the control file must be
+regernerated in unstable (or at least with a matching dpkg version).
+
  -- Dima Kogan <dima@oblong.com>, Tue, 25 Feb 2014 11:41:50 -0800
