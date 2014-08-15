@@ -10,9 +10,9 @@ stamp            := stamp/
 
 DISTRO ?= $(shell lsb_release -is)
 
-
-VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-'|cut -d '.' -f1-3)
+DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' ')
 PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-')
+VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-'|cut -d '.' -f1-3)
 
 BINUTILS_DIR  := /usr/src/binutils
 
@@ -133,3 +133,13 @@ control:
 	    sed -e "s/ARCH_LIST_FOR_BINARY/$${ARCH_LIST_FOR_BINARY}/g" | \
 	    sed -e "s/DEB_TARGET_GNU_TYPE/$${TARGET_PACKAGENAME}/g" >> debian/control; \
 	done
+
+
+# Manual convenience rule to update changelog to match current binutils version
+# Works outside build-environment  
+update-changelog:
+	pkgver=$( rmadison -a source -s sid binutils |  tail -n 1 | awk '{ print $1 "_" $3 }' )
+	dch -i --no-auto-nmu -D unstable "Rebuild using binutils $$pkgver"
+
+update-changelog-local:
+	dch -i --no-auto-nmu -D unstable "Rebuild using binutils ${DEB_VER_BINUTILS}"
