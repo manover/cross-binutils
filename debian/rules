@@ -8,8 +8,7 @@ THIS_PKG_MAINT   := $(shell dpkg-parsechangelog| sed -n 's/^Maintainer: \(.*\)/\
 DEB_HOST_ARCH    := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 stamp            := stamp/
 
-DISTRO ?= $(shell lsb_release -is)
-# Really ought to check that this isn't null.
+
 
 DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' ')
 PKG_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' '|cut -f 1 -d '-')
@@ -17,12 +16,19 @@ VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 
 BINUTILS_DIR  := /usr/src/binutils
 
+# We know the HOST and TARGET arches for Debian dna Ubuntu, but not others. 
+ifeq ($(DEB_VENDOR),)
+  $(error cannot detect distro. Giving up. Set DEB_VENDOR=Debian or Ubuntu)
+else
 ifeq ($(DISTRO),Debian)
 TARGET_LIST ?= armhf armel arm64 mips mipsel mips64el ppc64 powerpc i386 amd64
 HOST_LIST ?= amd64 i386 arm64
-else # Ubuntu
+endif
+ifeq($(DISTRO),Ubuntu)
 TARGET_LIST ?= armhf armel arm64
 HOST_LIST ?= amd64 i386 arm64
+endif
+ $(error unknown distro $DEB_VENDOR. Nothing will be built.) 
 endif
 
 # Don't try to build the HOST=TARGET (ie. non-cross) combination for this arch
