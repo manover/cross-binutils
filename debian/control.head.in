@@ -3,9 +3,8 @@ Section: devel
 Priority: extra
 Maintainer: Wookey <wookey@debian.org>
 Standards-Version: 3.9.5
-Build-Depends: binutils-source (>=2.24-4), autoconf (>=2.64), dejagnu, file,
-  bison, flex, gettext, texinfo, quilt, lsb-release,
-  xz-utils, python3:any, zlib1g-dev
+Build-Depends: binutils-source (>=2.24-4), autoconf, dejagnu, file,
+  bison, flex, gettext, texinfo, quilt, xz-utils, python3:any, zlib1g-dev
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=crosstoolchain/cross-binutils.git
 Vcs-Git: git://git.debian.org/git/crosstoolchain/cross-binutils
 
