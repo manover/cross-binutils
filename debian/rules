@@ -16,19 +16,19 @@ VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 
 BINUTILS_DIR  := /usr/src/binutils
 
-# We know the HOST and TARGET arches for Debian dna Ubuntu, but not others. 
-ifeq ($(DEB_VENDOR),)
+DISTRO= $(shell dpkg-vendor --query Vendor)
+
+# We know the HOST and TARGET arches for Debian and Ubuntu, but not others. 
+ifeq ($(strip $(DISTRO)),)
   $(error cannot detect distro. Giving up. Set DEB_VENDOR=Debian or Ubuntu)
+else ifeq ($(DISTRO),Debian)
+  TARGET_LIST ?= armhf armel arm64 mips mipsel mips64el ppc64 powerpc i386 amd64
+  HOST_LIST ?= amd64 i386 arm64
+else ifeq ($(DISTRO),Ubuntu)
+  TARGET_LIST ?= armhf armel arm64
+  HOST_LIST ?= amd64 i386
 else
-ifeq ($(DISTRO),Debian)
-TARGET_LIST ?= armhf armel arm64 mips mipsel mips64el ppc64 powerpc i386 amd64
-HOST_LIST ?= amd64 i386 arm64
-endif
-ifeq($(DISTRO),Ubuntu)
-TARGET_LIST ?= armhf armel arm64
-HOST_LIST ?= amd64 i386 arm64
-endif
- $(error unknown distro $DEB_VENDOR. Nothing will be built.) 
+  $(error unknown distro "$(DISTRO)". Nothing will be built.) 
 endif
 
 # Don't try to build the HOST=TARGET (ie. non-cross) combination for this arch
