@@ -20,7 +20,7 @@ DISTRO ?= $(shell dpkg-vendor --query Vendor)
 
 # We know the HOST and TARGET arches for Debian and Ubuntu, but not others. 
 ifeq ($(strip $(DISTRO)),)
-  $(error cannot detect distro. Giving up. Set DEB_VENDOR=Debian or Ubuntu)
+  $(error cannot detect distro. Giving up. Set $DISTRO to 'Debian' or 'Ubuntu')
 else ifeq ($(DISTRO),Debian)
   TARGET_LIST ?= armhf armel arm64 mips mipsel mips64el ppc64 powerpc i386 amd64
   HOST_LIST ?= amd64 i386 arm64
