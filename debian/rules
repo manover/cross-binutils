@@ -16,7 +16,7 @@ VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 
 BINUTILS_DIR  := /usr/src/binutils
 
-DISTRO= $(shell dpkg-vendor --query Vendor)
+DISTRO ?= $(shell dpkg-vendor --query Vendor)
 
 # We know the HOST and TARGET arches for Debian and Ubuntu, but not others. 
 ifeq ($(strip $(DISTRO)),)
