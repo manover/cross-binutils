@@ -1,8 +1,9 @@
 cross-binutils (0.6) unstable; urgency=low
 
-  * Rebuild using binutils binutils_2.24.51.20140807-1
+  * Rebuild using binutils binutils_2.24.51.20140814-2
   * Update control file for change from i486-linux-gnu to i586-linux-gnu
   * Add ppc64 target binutils 
+  * Use dpkg-vendor instead of lsb-release
 
  -- wookey <wookey@wookware.org>  Thu, 14 Aug 2014 17:25:04 +0100
 
