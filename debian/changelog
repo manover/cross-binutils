@@ -1,3 +1,10 @@
+cross-binutils (0.7) unstable; urgency=medium
+
+  * Rebuild using binutils_2.24.51.20140818-1
+  * Change ppc64 to ppc64el
+
+ -- Wookey <wookey@debian.org>  Fri, 29 Aug 2014 03:08:28 +0100
+
 cross-binutils (0.6) unstable; urgency=low
 
   * Rebuild using binutils binutils_2.24.51.20140814-2
