@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This is just a convenience script  - not part of the package
+# Run it as git/buildpackage from outside the git checkout.
 
 # Use this from outside a configured unstable chroot.
 # needs git-buildpackage and sbuild (outside the chroot)
@@ -9,8 +10,9 @@
 chroot=unstable-amd64-cross-sbuild
 
 #use --git-debian-branch=foo if not building from master
-mv ../cross-binutils/* ../cross-binutils.old/
+mv cross-binutils/* cross-binutils.old/
 
+pushd git
 # regenerate the control file in case anything changed and we forgot to do it
 # this must be done in unstable to allow for dpkg-architecture changes
 # want to run in chroot so that dpkg-arch patterns match
@@ -20,8 +22,9 @@ mv ../cross-binutils/* ../cross-binutils.old/
 
 if git-buildpackage  --git-tag --git-retag  --git-prebuild="schroot -c $chroot -- debian/rules control" \
     --git-force-create --git-export-dir=../cross-binutils -S -uc -us; then
-  pushd ../../cross-binutils
+  pushd ../cross-binutils
   ver=$(head -n1 ../git/debian/changelog | awk '{ print $2 }' | sed -e 's/[()]//g')
   sbuild -d unstable -c $chroot -A -s --force-orig-source cross-binutils_${ver}.dsc
   popd
 fi
+popd
