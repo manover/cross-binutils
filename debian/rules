@@ -144,9 +144,9 @@ control:
 
 # Manual convenience rule to update changelog to match current binutils version
 # Works outside build-environment  
-update-changelog:
-	pkgver=$( rmadison -a source -s sid binutils |  tail -n 1 | awk '{ print $1 "_" $3 }' )
+update-changelog-external:
+	pkgver=$$( rmadison -a source -s sid binutils |  tail -n 1 | awk '{ print $$1 "_" $$3 }' );\
 	dch -i --no-auto-nmu -D unstable "Rebuild using binutils $$pkgver"
 
-update-changelog-local:
+update-changelog:
 	dch -i --no-auto-nmu -D unstable "Rebuild using binutils ${DEB_VER_BINUTILS}"
