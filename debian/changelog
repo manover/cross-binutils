@@ -1,30 +1,36 @@
+cross-binutils (0.13) unstable; urgency=low
+
+  * Rebuild using binutils_2.24.90.20141014-1
+
+ -- wookey <wookey@wookware.org>  Fri, 17 Oct 2014 12:33:17 +0100
+
 cross-binutils (0.12) unstable; urgency=low
 
-  * Rebuild using binutils binutils_2.24.51.20141001-3
+  * Rebuild using binutils_2.24.51.20141001-3
 
  -- wookey <wookey@wookware.org>  Sun, 12 Oct 2014 21:48:04 +0100
 
 cross-binutils (0.11) unstable; urgency=low
 
-  * Rebuild using binutils binutils_2.24.51.20141001-2
+  * Rebuild using binutils_2.24.51.20141001-2
 
  -- wookey <wookey@wookware.org>  Sun, 05 Oct 2014 15:34:26 +0100
 
 cross-binutils (0.10) unstable; urgency=low
 
-  * Rebuild using binutils binutils_2.24.51.20141001-1
+  * Rebuild using binutils_2.24.51.20141001-1
 
  -- wookey <wookey@wookware.org>  Thu, 02 Oct 2014 16:02:12 +0100
 
 cross-binutils (0.9) unstable; urgency=low
 
-  * Rebuild using binutils binutils_2.24.51.20140918-1
+  * Rebuild using binutils_2.24.51.20140918-1
 
  -- wookey <wookey@wookware.org>  Fri, 19 Sep 2014 00:33:08 +0100
 
 cross-binutils (0.8) unstable; urgency=low
 
-  * Rebuild using binutils binutils_2.24.51.20140903-1
+  * Rebuild using binutils_2.24.51.20140903-1
 
  -- wookey <wookey@wookware.org>  Mon, 15 Sep 2014 16:53:11 +0100
 

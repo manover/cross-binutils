@@ -146,7 +146,7 @@ control:
 # Works outside build-environment  
 update-changelog-external:
 	pkgver=$$( rmadison -a source -s sid binutils |  tail -n 1 | awk '{ print $$1 "_" $$3 }' );\
-	dch -i --no-auto-nmu -D unstable "Rebuild using binutils $$pkgver"
+	dch -i --no-auto-nmu -D unstable "Rebuild using $$pkgver"
 
 update-changelog:
 	dch -i --no-auto-nmu -D unstable "Rebuild using binutils ${DEB_VER_BINUTILS}"
