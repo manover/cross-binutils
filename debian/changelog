@@ -1,3 +1,9 @@
+cross-binutils (0.15) unstable; urgency=medium
+
+  * Rebuild using binutils 2.24.90.20141104-1
+
+ -- wookey <wookey@wookware.org>  Tue, 04 Nov 2014 13:11:40 +0000
+
 cross-binutils (0.14) unstable; urgency=low
 
   * Rebuild using binutils_2.24.90.20141023-1
