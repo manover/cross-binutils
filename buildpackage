@@ -7,7 +7,7 @@
 # needs git-buildpackage and sbuild (outside the chroot)
 # and lsb-release inside the chroot
 
-chroot=unstable-amd64-cross-sbuild
+chroot=unstable-amd64-sbuild
 
 #use --git-debian-branch=foo if not building from master
 mv cross-binutils/* cross-binutils.old/
