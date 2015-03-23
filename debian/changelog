@@ -1,3 +1,9 @@
+cross-binutils (0.23) unstable; urgency=medium
+
+  * Rebuild using binutils 2.25-5
+
+ -- Wookey <wookey@debian.org>  Mon, 23 Mar 2015 23:15:38 +0000
+
 cross-binutils (0.22) unstable; urgency=medium
 
   * Rebuild using binutils_2.25-4
