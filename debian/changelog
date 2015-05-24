@@ -1,3 +1,10 @@
+cross-binutils (0.26) unstable; urgency=medium
+
+  * Add mips64 to target arches (Closes: #786701)
+  * Add ppc64el to host arches
+
+ -- Wookey <wookey@debian.org>  Sun, 24 May 2015 18:24:10 +0100
+
 cross-binutils (0.25) unstable; urgency=medium
 
   * Use BinNMUs instead of version bump to rebuild aginst latest binutils
