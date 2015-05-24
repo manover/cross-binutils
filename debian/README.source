@@ -8,12 +8,14 @@ this one package.
 
 To change the set of TARGET architectures built, or the set of HOST
 architectures they are built for, set the TARGET_LIST and HOST_LIST
-variables respectively, then run:
+variables respectively (they are space-separated lists of debian
+architectures), then run:
 debian/rules control
-Then build in the normal way.
+Then build in the normal way (keeping the same TARGET_LIST and
+HOST_LIST set).
 
 You can either set them on the command line, or change them in the
-rules file.
+rules file. 
 
 e.g (if just overriding on the command line):
 TARGET_LIST="armel armhf" HOST_LIST="amd64" debian/rules control
@@ -25,6 +27,6 @@ package as well as when building debian/control
 debian/rules control needs to be re-run whenever the arch lists are
 changed or if dpkg arch names change (e.g i486-linux-gnu ->
 i586-linux-gnu). Note that in the latter case the control file must be
-regernerated in unstable (or at least with a matching dpkg version).
+regenerated in unstable (or at least with a matching dpkg version).
 
  -- Dima Kogan <dima@oblong.com>, Tue, 25 Feb 2014 11:41:50 -0800
