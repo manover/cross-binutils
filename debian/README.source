@@ -1,6 +1,6 @@
 This package does not contain the sources used to build the resulting 
 binary packages.  It build-depends on the binutils source and uses
-that (via the binutils-source package). A Built-Using header to
+that (via the binutils-source binary package). A Built-Using header to
 indicate this is used.
 
 All the supported binutils cross-target architectures are built by

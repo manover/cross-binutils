@@ -23,7 +23,7 @@ ifeq ($(strip $(DISTRO)),)
   $(error cannot detect distro. Giving up. Set $DISTRO to 'Debian' or 'Ubuntu')
 else ifeq ($(DISTRO),Debian)
   TARGET_LIST ?= armhf armel arm64 mips mips64 mipsel mips64el powerpc ppc64el i386 amd64
-  HOST_LIST ?= amd64 i386 arm64 ppc64el
+  HOST_LIST ?= amd64 i386 armhf arm64 ppc64el
 else ifeq ($(DISTRO),Ubuntu)
   TARGET_LIST ?= armhf armel arm64 
   HOST_LIST ?= amd64 i386 arm64 ppc64el
@@ -143,10 +143,11 @@ control:
 
 
 # Manual convenience rule to update changelog to match current binutils version
-# Works outside build-environment  
+# works outside build-environment  
 update-changelog-external:
 	pkgver=$$( rmadison -a source -s sid binutils |  tail -n 1 | awk '{ print $$1 "_" $$3 }' );\
 	dch -i --no-auto-nmu -D unstable "Rebuild using $$pkgver"
 
+# works inside build environment
 update-changelog:
 	dch -i --no-auto-nmu -D unstable "Rebuild using binutils ${DEB_VER_BINUTILS}"
