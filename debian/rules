@@ -1,13 +1,11 @@
 #!/usr/bin/make -f
 
-
 THIS_PKG         := $(shell dpkg-parsechangelog| sed -n 's/-*//; s/^Source: \(.*\)/\1/p')
 THIS_PKG_VER     := $(shell dpkg-parsechangelog| sed -n 's/^Version: \(.*\)/\1/p')
 THIS_PKG_MAINT   := $(shell dpkg-parsechangelog| sed -n 's/^Maintainer: \(.*\)/\1/p')
 
 DEB_HOST_ARCH    := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 stamp            := stamp/
-
 
 
 DEB_VER_BINUTILS := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/changelog | egrep '^Version:' | cut -f 2 -d ' ')
@@ -17,6 +15,8 @@ VER_BINUTILS     := $(shell dpkg-parsechangelog -l/usr/src/binutils/debian/chang
 BINUTILS_DIR  := /usr/src/binutils
 
 DISTRO ?= $(shell dpkg-vendor --query Vendor)
+
+export DH_VERBOSE=1
 
 # We know the HOST and TARGET arches for Debian and Ubuntu, but not others. 
 ifeq ($(strip $(DISTRO)),)
@@ -44,7 +44,7 @@ $(stamp)init:
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS} ;\
 	cp -a ${BINUTILS_DIR}/debian/ . ;\
-	if [ -n "$$(grep -v '^\#' debian/patches/binutils/series)" ]; then \
+	if [ -r debian/patches/binutils/series ] && [ -n "$$(grep -v '^\#' debian/patches/binutils/series)" ]; then \
 	  QUILT_PATCHES=debian/patches/binutils quilt push -a; \
 	fi; \
 
@@ -54,18 +54,18 @@ $(stamp)build-%: $(stamp)init
 	@echo START $@
 	set -e; \
 	cd binutils-${PKG_VER_BINUTILS}; \
-	DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -T control-stamp; \
-	WITH_SYSROOT=/ DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -B -uc -us; \
+	DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -T stamps/control; \
+	ALT_TARGET_ARCH=$$(dpkg-architecture -A$* -qDEB_TARGET_ARCH -f 2>/dev/null | sed -e 's/_/-/g'); \
+	sed -i -e "s/@host_archs@/${HOST_LIST}/g; s/@binutils_alt_triplet@/binutils-$$ALT_TARGET_ARCH/g" debian/control; \
+	WITH_SYSROOT=/ DEB_TARGET_ARCH=$* TARGET=$* dpkg-buildpackage -j$$(($$(nproc)+1)) -B -uc -us; \
 	cd ..; \
 	touch $@
-
 
 clean:
 	rm -rf repackfiles tmp debian/tmp debian/files 
 	rm -rf binutils-* *.deb *.changes
 	find debian -name '*~' -print0 | xargs -0 -r rm -f
 	rm -rf $(stamp)
-
 
 #
 # Repack resulting packages to make changes:
@@ -78,6 +78,7 @@ define repack_deb
 	pkgname=`echo $$deb | cut -d'_' -f1`; \
         sed -i -e's/^Source:.*/Source: ${THIS_PKG} (${THIS_PKG_VER})/' tmp/DEBIAN/control; \
         sed -i -e's/^Maintainer:.*/Maintainer: ${THIS_PKG_MAINT}\nOriginal-Source-&/' tmp/DEBIAN/control; \
+	rm -f tmp/usr/lib/*/libbfd.so tmp/usr/lib/*/libopcodes.so; \
 	if [ -e debian/overrides/$$pkgname ]; then \
 	  mkdir -p tmp/usr/share/lintian/overrides; \
 	  cp debian/overrides/$$pkgname tmp/usr/share/lintian/overrides/; \
@@ -109,6 +110,7 @@ binary: binary-arch binary-indep
 binary-arch:  build-arch mangle-debian-files
 binary-indep:
 
+.NOTPARALLEL: binary-arch build
 
 $(stamp)debian-files:
 	@echo START $@

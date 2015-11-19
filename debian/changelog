@@ -1,3 +1,17 @@
+cross-binutils (0.27.1) unstable; urgency=medium
+
+  * Delete the conflicting and redundant libbfd.so and libopcodes.so
+    symlinks when repacking
+
+ -- Denis Bychkov <manover@gmail.com>  Thu, 19 Nov 2015 05:37:51 -0500
+
+cross-binutils (0.27) unstable; urgency=medium
+
+  * Was broken for binutils >= 2.25.1
+  * Fix binutil's broken control file when building
+
+ -- Denis Bychkov <manover@gmail.com>  Thu, 19 Nov 2015 05:02:15 -0500
+
 cross-binutils (0.26) unstable; urgency=medium
 
   * Add mips64 to target arches (Closes: 786701)
